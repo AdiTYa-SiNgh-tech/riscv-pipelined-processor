@@ -1,0 +1,66 @@
+// RISC-V Write Buffer Stress Test — NO BUFFER (WB_DEPTH=0)
+// 200 iterations of 5 consecutive stores + 8 ALU instructions
+// MEM_LATENCY=8, every store stalls → 200×5×8 = 8000 stall cycles
+//
+// Phase 1: Initialize registers (10 instructions, indices 0-9)
+//   0: addi x1,  x0, 1        x1 = 1
+//   1: addi x2,  x0, 2        x2 = 2
+//   2: addi x3,  x0, 3        x3 = 3
+//   3: addi x4,  x0, 4        x4 = 4
+//   4: addi x5,  x0, 5        x5 = 5
+//   5: addi x15, x0, 200      x15 = 200 (loop counter)
+//   6: addi x16, x0, 0        x16 = 0   (base address)
+//   7: addi x6,  x0, 6        x6 = 6
+//   8: addi x7,  x0, 7        x7 = 7
+//   9: addi x8,  x0, 8        x8 = 8
+//
+// Phase 2: LOOP START at instruction 10 (PC = 0x28)
+//  10: sw x1,  0(x16)         5 consecutive stores
+//  11: sw x2,  4(x16)
+//  12: sw x3,  8(x16)
+//  13: sw x4,  12(x16)
+//  14: sw x5,  16(x16)
+//  15-22: 8 ALU instructions (compute filler)
+//  23: addi x16, x16, 20      Advance base by 20
+//  24: andi x16, x16, 255     Wrap address
+//  25: addi x15, x15, -1      Decrement counter
+//  26: bne  x15, x0, -64      Branch to instruction 10
+//
+// Phase 3: POST-LOOP verification
+//  27: lw x11, 0(x0)
+//  28: lw x12, 4(x0)
+//  29: add x20, x11, x12
+//
+// Phase 1: Initialize registers
+00100093
+00200113
+00300193
+00400213
+00500293
+0C800793
+00000813
+00600313
+00700393
+00800413
+// Phase 2: LOOP — 5 stores + 8 ALU + 4 control (17 instructions)
+00182023
+00282223
+00382423
+00482623
+00582823
+002088B3
+00418933
+006289B3
+008388B3
+40308933
+004179B3
+0012E8B3
+0021C933
+01480813
+0FF87813
+FFF78793
+F80790E3
+// Phase 3: Post-loop loads + add
+00002583
+00402603
+00C58A33
