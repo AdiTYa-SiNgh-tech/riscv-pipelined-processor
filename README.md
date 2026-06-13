@@ -28,13 +28,6 @@ A 5-stage pipelined **RISC-V (RV32I) processor** designed and implemented in Ver
 * RISC-V RV32I
 * FPGA (Zybo Z7)
 
-## Project Structure
-
-```text
-src/       # Verilog source files
-docs/      # Project report
-results/   # Simulation and hardware outputs
-```
 
 ## Key Learnings
 
